@@ -22,10 +22,19 @@ function countDown() {
     state.view.timeLeft.textContent = state.values.currentTime;
 
     if (state.values.currentTime <= 0) {
+        playSound('game-over.mp3');
         clearInterval(state.actions.countDownTimeId);
         clearInterval(state.actions.timerId);
-        alert(`Game over! O seu resultado foi: ${state.values.result}`);
+        setTimeout(() => {
+            alert(`Game over! O seu resultado foi: ${state.values.result}`);
+        }, 50);
     }
+}
+
+function playSound(audioName) {
+    let audio = new Audio(`./src/audios/${audioName}`);
+    audio.volume = 0.2;
+    audio.play();
 }
 
 function randomSquare() {
@@ -48,6 +57,7 @@ function addListenerHitBox() {
                 state.values.result++;
                 state.view.score.textContent = state.values.result;
                 state.values.hitPosition = null;
+                playSound('hit.m4a');
             }
         });
     });
