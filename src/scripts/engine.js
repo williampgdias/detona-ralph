@@ -6,12 +6,27 @@ const state = {
         score: document.getElementById('score'),
     },
     values: {
-        timerId: null,
         gameSpeed: 1000,
         hitPosition: 0,
         result: 0,
+        currentTime: 10,
+    },
+    actions: {
+        timerId: setInterval(randomSquare, 1000),
+        countDownTimeId: setInterval(countDown, 1000),
     },
 };
+
+function countDown() {
+    state.values.currentTime--;
+    state.view.timeLeft.textContent = state.values.currentTime;
+
+    if (state.values.currentTime <= 0) {
+        clearInterval(state.actions.countDownTimeId);
+        clearInterval(state.actions.timerId);
+        alert(`Game over! O seu resultado foi: ${state.values.result}`);
+    }
+}
 
 function randomSquare() {
     state.view.squares.forEach((square) => {
@@ -24,10 +39,6 @@ function randomSquare() {
     randomSquare.classList.add('enemy');
 
     state.values.hitPosition = randomSquare.id;
-}
-
-function moveEnemy() {
-    state.values.timerId = setInterval(randomSquare, state.values.gameSpeed);
 }
 
 function addListenerHitBox() {
@@ -43,7 +54,6 @@ function addListenerHitBox() {
 }
 
 function init() {
-    moveEnemy();
     addListenerHitBox();
 }
 
