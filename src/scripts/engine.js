@@ -4,12 +4,15 @@ const state = {
         enemy: document.querySelector('.enemy'),
         timeLeft: document.getElementById('time-left'),
         score: document.getElementById('score'),
+        gameOver: document.querySelector('.game-over'),
+        userLives: document.getElementById('user-lives'),
     },
     values: {
         gameSpeed: 1000,
         hitPosition: 0,
         result: 0,
-        currentTime: 10,
+        currentTime: 60,
+        startUserLives: 3,
     },
     actions: {
         timerId: setInterval(randomSquare, 1000),
@@ -22,12 +25,23 @@ function countDown() {
     state.view.timeLeft.textContent = state.values.currentTime;
 
     if (state.values.currentTime <= 0) {
-        playSound('game-over.mp3');
         clearInterval(state.actions.countDownTimeId);
         clearInterval(state.actions.timerId);
-        setTimeout(() => {
-            alert(`Game over! O seu resultado foi: ${state.values.result}`);
-        }, 50);
+        playSound('game-over.mp3');
+
+        const gameOverMessage = `Game over! O seu resultado foi: ${state.values.result}`;
+        state.view.gameOver.style.display = 'block';
+        state.view.gameOver.innerHTML = gameOverMessage;
+
+        state.values.startUserLives--;
+        state.view.userLives.textContent = state.values.startUserLives;
+
+        if (state.values.startUserLives <= 0) {
+            state.view.gameOver.innerHTML =
+                'Game Over! Para jogar novamente, atualize a página.';
+        } else {
+            setTimeout(resetGame, 2000);
+        }
     }
 }
 
@@ -53,7 +67,10 @@ function randomSquare() {
 function addListenerHitBox() {
     state.view.squares.forEach((square) => {
         square.addEventListener('mousedown', () => {
-            if (square.id === state.values.hitPosition) {
+            if (
+                square.id === state.values.hitPosition &&
+                state.values.currentTime > 0
+            ) {
                 state.values.result++;
                 state.view.score.textContent = state.values.result;
                 state.values.hitPosition = null;
@@ -61,6 +78,19 @@ function addListenerHitBox() {
             }
         });
     });
+}
+
+function resetGame() {
+    state.values.currentTime = 60;
+    state.values.result = 0;
+    state.values.hitPosition = null;
+
+    state.view.timeLeft.textContent = state.values.currentTime;
+    state.view.score.textContent = state.values.result;
+    state.view.gameOver.style.display = 'none';
+
+    state.actions.timerId = setInterval(randomSquare, state.values.gameSpeed);
+    state.actions.countDownTimeId = setInterval(countDown, 1000);
 }
 
 function init() {
